@@ -6,11 +6,13 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -95,7 +97,14 @@ public class AutofitHelper {
             return;
         }
 
-        int targetWidth = view.getWidth() - view.getCompoundPaddingLeft() - view.getPaddingLeft() - view.getCompoundPaddingRight() - view.getPaddingRight();
+        int targetWidth = view.getWidth() - view.getCompoundPaddingLeft() - view.getCompoundPaddingRight();
+        try {
+            ImageSpan[] imageSpans = ((SpannableStringBuilder) view.getText()).getSpans(0, view.getText().length(), ImageSpan.class);
+            for (ImageSpan span : imageSpans) {
+                targetWidth -= span.getDrawable().getBounds().width();
+            }
+        } catch (ClassCastException e) {
+        }
         if (targetWidth <= 0) {
             return;
         }
